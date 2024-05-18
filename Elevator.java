@@ -1,44 +1,59 @@
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-public class Elev_work {
-    private List<Elevator> elevators;
+public class Elevator {
+    private int id;
+    private int curFloor;
+    private List<Integer> targetFloors;
+    private String direction;
 
-    public Elev_work(int numElevs) {
-        elevators = new ArrayList<>();
-        for (int i = 1; i <= numElevs; i++) {
-            elevators.add(new Elevator(i));
-        }
+    public Elevator (int id) {
+        this.id = id;
+        this.curFloor = 1;
+        this.targetFloors = new CopyOnWriteArrayList<>();
+        this.direction = null;
     }
 
-    public synchronized void reqElevator(int reqFloor) {
-        Elevator bestElevator = null;
-        int minDist = Integer.MAX_VALUE;
-        for (Elevator elevator : elevators) {
-            int distance = Math.abs(elevator.getCurFloor() - reqFloor);
-            if ((elevator.getDirection() == null) ||
-                    (elevator.getDirection().equals("up") && elevator.getCurFloor() <= reqFloor) ||
-                    (elevator.getDirection().equals("down") && elevator.getCurFloor() >= reqFloor)) {
-                if (distance < minDist) {
-                    bestElevator = elevator;
-                    minDist = distance;
+    public int getId() {
+        return id;
+    }
+
+    public int getCurFloor() {
+        return curFloor;
+    }
+
+    public List <Integer> getTargetFloors() {
+        return targetFloors;
+    }
+
+    public void moves() {
+        if (!targetFloors.isEmpty()) {
+            int nextFloor = targetFloors.get(0);
+            if (curFloor < nextFloor) {
+                curFloor++;
+                direction = "up";
+            } else if (curFloor > nextFloor) {
+                curFloor--;
+                direction = "down";
+            }
+            if (curFloor == nextFloor) {
+                targetFloors.remove(0);
+                if (targetFloors.isEmpty()) {
+                    direction = null;
                 }
             }
         }
-        if (bestElevator != null) {
-            bestElevator.addTargetFloor(reqFloor);
+    }
+
+    public void addTargetFloor(int floor) {
+        if (!targetFloors.contains(floor)) {
+            targetFloors.add(floor);
+            targetFloors.sort(Integer::compareTo);
         }
     }
 
-    public void step() {
-        for (Elevator elevator : elevators) {
-            elevator.moves();
-        }
-    }
-
-    public void printCondition() {
-        for (Elevator elevator : elevators) {
-            System.out.println("Elevator " + elevator.getId() + ": Floor " + elevator.getCurFloor() + ", Target floors: " + elevator.getTargetFloors());
-        }
+    public String getDirection() {
+        return direction;
     }
 }
