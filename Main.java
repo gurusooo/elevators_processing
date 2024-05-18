@@ -2,6 +2,7 @@ import  java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println("HSE office decided to build a new campus with 20 floors and two elevators. This is how elevators' calls are processed. Completed by M. Shkuleva");
         Elev_work system = new Elev_work(2);
         Thread reqThread = new Thread(new Runnable() {
             @Override
